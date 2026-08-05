@@ -436,7 +436,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
       <div class="panel-head">
         <span class="eyebrow">01 · Retention &amp; lifetime value</span>
         <h2>How long does a customer actually stay?</h2>
-        <p class="question">The number every franchisee needs and almost never has: once someone starts paying, how long do they keep paying, and what is that worth?</p>
+        <p class="question">Once someone starts paying, how long do they keep paying, and what is that worth?</p>
       </div>
 
       <div class="card">
@@ -617,6 +617,20 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
       </div>
 
       <div class="card">
+        <h3>Why a pound saved is worth more, worked through</h3>
+        <p class="caption">The mechanism behind the calculator below, with real numbers instead of just the claim</p>
+        <div class="formula-box" style="font-family:'IBM Plex Mono',monospace; font-size:14px; line-height:2; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:18px 22px; margin:0">
+          You book <strong style="color:var(--accent-deep)">£100 more</strong> in storage fees this month →<br>
+          you owe 10% royalty+levy on it → <strong style="color:var(--accent-deep)">−£10</strong>, before any delivery cost even comes off →<br>
+          <strong>£90 left, before costs</strong><br><br>
+          You find a way to spend <strong style="color:var(--accent-deep)">£10 less</strong> this month (cheaper fuel route, say) →<br>
+          that £10 was never revenue, so the royalty/levy never touches it →<br>
+          <strong>the full £10 stays yours</strong>
+        </div>
+        <p class="body-text" style="font-size:13.5px; color:var(--ink-muted); margin-top:14px">Same £10, two different outcomes — because one path is taxed by the franchise fee and the other isn't. That gap is the whole idea; the calculator below just lets you see how big it is with your own numbers.</p>
+      </div>
+
+      <div class="card">
         <h3>Leverage calculator</h3>
         <p class="caption">Interactive · defaults are illustrative, replace with your real figures</p>
         <div class="calc-grid">
@@ -643,12 +657,13 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
         <h3>Illustrative job-cost examples</h3>
         <p class="caption">Not from any real business — three made-up job types, so you can see what a real cost-by-job-type breakdown would eventually look like once your own P&amp;L (profit &amp; loss — your real revenue/cost accounts) is behind it</p>
         <div style="overflow-x:auto">
-        <table>
-          <thead><tr><th>Job type (made up)</th><th class="mono">Est. direct cost (made up)</th><th>Where the saving might be</th></tr></thead>
+        <table style="table-layout:fixed">
+          <colgroup><col style="width:24%"><col style="width:20%"><col style="width:56%"></colgroup>
+          <thead><tr><th style="white-space:normal">Job type (made up)</th><th class="mono" style="white-space:normal">Est. direct cost (made up)</th><th style="white-space:normal">Where the saving might be</th></tr></thead>
           <tbody>
-            <tr><td>Standard collection, local (&lt;5mi)</td><td class="mono">£42</td><td>Route batching with same-day jobs</td></tr>
-            <tr><td>Standard collection, distant (&gt;15mi)</td><td class="mono">£78</td><td>Minimum-distance surcharge</td></tr>
-            <tr><td>Multi-pod collection</td><td class="mono">£51 / pod</td><td>Already near-optimal — bulk discount is earned, not lost margin</td></tr>
+            <tr><td style="white-space:normal; word-break:break-word">Standard collection, local (&lt;5mi)</td><td class="mono" style="white-space:normal">£42</td><td style="white-space:normal; word-break:break-word">Combine with other nearby pickups on the same trip, instead of one van/job</td></tr>
+            <tr><td style="white-space:normal; word-break:break-word">Standard collection, distant (&gt;15mi)</td><td class="mono" style="white-space:normal">£78</td><td style="white-space:normal; word-break:break-word">Charge more for far-out jobs — the drive there is most of what's costing you</td></tr>
+            <tr><td style="white-space:normal; word-break:break-word">Multi-pod collection</td><td class="mono" style="white-space:normal">£51 / pod</td><td style="white-space:normal; word-break:break-word">Already efficient — one trip for several pods is exactly what should cost less per pod, not a loss to fix</td></tr>
           </tbody>
         </table>
         </div>
