@@ -483,6 +483,33 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
         </div>
       </div>
 
+      <div class="card">
+        <h3>At what point does the warehouse turn a profit?</h3>
+        <p class="caption">Interactive · fixed monthly cost, split across however many pods are filled</p>
+        <div class="calc-grid">
+          <div style="display:flex; flex-direction:column; gap:20px">
+            <div class="slider-block">
+              <div class="row"><label for="wh-cost-slider">Warehouse fixed cost / month</label><span class="val mono" id="wh-cost-val">£1,000</span></div>
+              <input type="range" id="wh-cost-slider" min="200" max="5000" value="1000" step="100">
+            </div>
+            <div class="slider-block">
+              <div class="row"><label for="wh-capacity-slider">Total pod capacity</label><span class="val mono" id="wh-capacity-val">100</span></div>
+              <input type="range" id="wh-capacity-slider" min="10" max="300" value="100" step="10">
+            </div>
+            <div class="slider-block">
+              <div class="row"><label for="wh-price-slider">Price per pod / month</label><span class="val mono" id="wh-price-val">£15</span></div>
+              <input type="range" id="wh-price-slider" min="5" max="60" value="15" step="1">
+            </div>
+          </div>
+          <div class="leverage-result">
+            <span class="sub" id="wh-headline">Break even once</span>
+            <span class="ratio mono" id="wh-breakeven-pods">67 pods</span>
+            <span class="sub" id="wh-breakeven-detail">are filled (67% of capacity) — every pod beyond that is profit.</span>
+          </div>
+        </div>
+        <p class="optim-note">At £10/pod with 100 slots, £1,000/month never breaks even — 100% full only just covers cost, so there's no profit at any occupancy. At £20/pod, break-even falls to 50 pods (50% full) — the other half of the warehouse is pure margin. Small changes in price per pod move the break-even point a lot; try it above.</p>
+      </div>
+
       <div class="need-box">
         <span class="lbl">What we'd need from you</span>
         <p>Total pod capacity (even a rough figure), plus pod-months booked — likely derivable from the same billing/booking data as retention, if it records pod count per customer.</p>
@@ -508,10 +535,11 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 
       <div class="card">
         <h3>Full breakdown</h3>
+        <p class="caption">Every reason at once, including its predicted access rate and warehouse zone — the same logic as the Franchise Optimiser tab, shown per segment instead of one at a time</p>
         <div style="overflow-x:auto">
         <table id="table-segments">
           <thead><tr>
-            <th>Reason</th><th class="mono">Share of customers</th><th class="mono">Avg. stay</th><th class="mono">Avg. LTV</th>
+            <th>Reason</th><th class="mono">Share of customers</th><th class="mono">Avg. stay</th><th class="mono">Avg. LTV</th><th class="mono">Predicted access</th><th>Zone</th>
           </tr></thead>
           <tbody></tbody>
         </table>
@@ -520,7 +548,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 
       <div class="need-box">
         <span class="lbl">What we'd need from you</span>
-        <p>An enquiry record with a "reason for storing" field — almost certainly not captured today — matched against actual stay length from billing. This is a one-question addition at enquiry, not a data-access request.</p>
+        <p>A "reason for storing" field at enquiry, matched against actual stay length from billing. Likely not captured today — this is a one-question addition to the enquiry form, not a data-access request.</p>
       </div>
     </section>
 
@@ -613,10 +641,10 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 
       <div class="card">
         <h3>Illustrative job-cost examples</h3>
-        <p class="caption">Made up to show the shape of the answer — the real version only means anything with your actual P&amp;L</p>
+        <p class="caption">Not from any real business — three made-up job types, so you can see what a real cost-by-job-type breakdown would eventually look like once your own P&amp;L (profit &amp; loss — your real revenue/cost accounts) is behind it</p>
         <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>Job type</th><th class="mono">Est. direct cost</th><th>Where the saving might be</th></tr></thead>
+          <thead><tr><th>Job type (made up)</th><th class="mono">Est. direct cost (made up)</th><th>Where the saving might be</th></tr></thead>
           <tbody>
             <tr><td>Standard collection, local (&lt;5mi)</td><td class="mono">£42</td><td>Route batching with same-day jobs</td></tr>
             <tr><td>Standard collection, distant (&gt;15mi)</td><td class="mono">£78</td><td>Minimum-distance surcharge</td></tr>
@@ -848,9 +876,12 @@ renderBarChart('chart-segments', 'tt-segments',
 
 const segBody = document.querySelector('#table-segments tbody');
 segments.slice().sort((a, b) => b.stayMonths - a.stayMonths).forEach(s => {
+  const r = optimiserRules[s.reason];
   const tr = document.createElement('tr');
   tr.innerHTML = `<td><span class="swatch" style="background:${s.color}"></span>${s.reason}</td>
-    <td class="mono">${s.share}%</td><td class="mono">${s.stayMonths} mo</td><td class="mono">£${s.ltv.toLocaleString()}</td>`;
+    <td class="mono">${s.share}%</td><td class="mono">${s.stayMonths} mo</td><td class="mono">£${s.ltv.toLocaleString()}</td>
+    <td class="mono">${r ? r.access : '—'}</td>
+    <td>${r ? `<span class="zone-pill zone-${r.zone}">${r.zone}</span>` : '—'}</td>`;
   segBody.appendChild(tr);
 });
 
@@ -895,6 +926,37 @@ function updateLeverage() {
 feeSlider.addEventListener('input', updateLeverage);
 costSlider.addEventListener('input', updateLeverage);
 updateLeverage();
+
+// warehouse break-even calculator
+const whCostSlider = document.getElementById('wh-cost-slider');
+const whCapacitySlider = document.getElementById('wh-capacity-slider');
+const whPriceSlider = document.getElementById('wh-price-slider');
+function updateWarehouseBreakeven() {
+  const cost = parseFloat(whCostSlider.value);
+  const capacity = parseFloat(whCapacitySlider.value);
+  const price = parseFloat(whPriceSlider.value);
+  document.getElementById('wh-cost-val').textContent = '£' + cost.toLocaleString();
+  document.getElementById('wh-capacity-val').textContent = capacity;
+  document.getElementById('wh-price-val').textContent = '£' + price;
+
+  const podsNeeded = Math.ceil(cost / price);
+  const pctNeeded = Math.round((podsNeeded / capacity) * 100);
+  const headline = document.getElementById('wh-headline');
+  const podsEl = document.getElementById('wh-breakeven-pods');
+  const detailEl = document.getElementById('wh-breakeven-detail');
+
+  if (podsNeeded > capacity) {
+    headline.textContent = 'Never breaks even';
+    podsEl.textContent = 'even at 100% full';
+    detailEl.textContent = `${capacity} pods × £${price} = £${(capacity*price).toLocaleString()}/month, short of the £${cost.toLocaleString()} cost. Raise the price or cut the fixed cost.`;
+  } else {
+    headline.textContent = 'Break even once';
+    podsEl.textContent = `${podsNeeded} pods`;
+    detailEl.textContent = `are filled (${pctNeeded}% of capacity) — every pod beyond that is profit.`;
+  }
+}
+[whCostSlider, whCapacitySlider, whPriceSlider].forEach(el => el.addEventListener('input', updateWarehouseBreakeven));
+updateWarehouseBreakeven();
 
 // re-render charts on theme change (colors are read from CSS vars at render time)
 document.getElementById('themeToggle').addEventListener('click', () => {
