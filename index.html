@@ -156,10 +156,6 @@ button { font-family: inherit; }
   grid-template-columns: 260px 1fr;
   min-height: 100vh;
 }
-@media (max-width: 860px) {
-  .shell { grid-template-columns: 1fr; }
-  .rail { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-}
 
 .rail {
   background: var(--surface-2);
@@ -172,6 +168,10 @@ button { font-family: inherit; }
   display: flex;
   flex-direction: column;
   gap: 24px;
+}
+@media (max-width: 860px) {
+  .shell { grid-template-columns: 1fr; }
+  .rail { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
 }
 .brand {
   display: flex;
